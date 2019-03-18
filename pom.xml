@@ -19,6 +19,8 @@
 	</properties>
 
 	<dependencies>
+		
+		<!-- Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -27,22 +29,36 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+         	<groupId>org.springframework.boot</groupId>
+         	<artifactId>spring-boot-starter-security</artifactId>
+         </dependency>
+		
+		<!-- Other -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		
+		<!-- Tools -->
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -58,8 +74,12 @@
              <artifactId>junit-jupiter-engine</artifactId>
              <scope>test</scope>
          </dependency>
-		
-		
+         <dependency>
+         	<groupId>org.springframework.security</groupId>
+         	<artifactId>spring-security-test</artifactId>
+         	<scope>test</scope>
+         </dependency>
+         
 	</dependencies>
 
 	<build>

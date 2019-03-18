@@ -18,11 +18,29 @@ CREATE SCHEMA IF NOT EXISTS `cookplanner` DEFAULT CHARACTER SET utf8mb4 COLLATE 
 USE `cookplanner` ;
 
 -- -----------------------------------------------------
+-- Table `cookplanner`.`account`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cookplanner`.`account` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `created_on` DATETIME(6) NULL DEFAULT NULL,
+  `last_login` DATETIME(6) NULL DEFAULT NULL,
+  `password` VARCHAR(100) NULL DEFAULT NULL,
+  `role` VARCHAR(15) NOT NULL,
+  `updated_on` DATETIME(6) NULL DEFAULT NULL,
+  `username` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `UK_gex1lmaqpg0ir5g1f5eftyaa1` (`username` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
 -- Table `cookplanner`.`ingredient_name`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `cookplanner`.`ingredient_name` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(30) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UK_gqwucwtphhplubuwiy5nwjo9n` (`name` ASC) VISIBLE)
 ENGINE = InnoDB
@@ -36,10 +54,10 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `cookplanner`.`recipe` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `cook_time` INT(11) NULL DEFAULT NULL,
-  `description` VARCHAR(255) NULL DEFAULT NULL,
+  `description` VARCHAR(120) NULL DEFAULT NULL,
   `directions` LONGTEXT NULL DEFAULT NULL,
   `image` VARCHAR(255) NULL DEFAULT NULL,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(60) NULL DEFAULT NULL,
   `notes` LONGTEXT NULL DEFAULT NULL,
   `preparation_time` INT(11) NULL DEFAULT NULL,
   `preparations` LONGTEXT NULL DEFAULT NULL,
@@ -100,7 +118,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `cookplanner`.`planning` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `date` DATE NULL DEFAULT NULL,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(60) NULL DEFAULT NULL,
   `on_shopping_list` BIT(1) NOT NULL,
   `servings` INT(11) NULL DEFAULT NULL,
   `recipe_id` BIGINT(20) NULL DEFAULT NULL,
@@ -119,7 +137,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `cookplanner`.`tag` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(30) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UK_1wdpsed5kna2y38hnbgrnhi5b` (`name` ASC) VISIBLE)
 ENGINE = InnoDB
@@ -149,4 +167,3 @@ COLLATE = utf8mb4_0900_ai_ci;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-

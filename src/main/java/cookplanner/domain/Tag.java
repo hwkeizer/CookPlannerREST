@@ -20,7 +20,7 @@ public class Tag {
 	private Long id;
 	
 	@NotBlank
-	@Column(unique=true)
+	@Column(unique = true, length = 30)
 	private String name;
 
 //	@ManyToMany(mappedBy = "tags")

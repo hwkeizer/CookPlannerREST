@@ -2,6 +2,7 @@ package cookplanner.domain;
 
 import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,7 +26,9 @@ public class Planning implements Comparable<Planning> {
 	@ManyToOne
 	private Recipe recipe;
 	
+	@Column(length = 60)
 	private String name;
+	
 	private Integer servings;	
 	private boolean onShoppingList;
 
