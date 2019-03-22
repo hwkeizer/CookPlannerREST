@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cookplanner.api.ApiResponse;
 import cookplanner.api.JWTAuthenticationResponse;
 import cookplanner.domain.Account;
+import cookplanner.exception.UsernameAlreadyExistsException;
 import cookplanner.repository.AccountRepository;
 import cookplanner.security.JWTTokenProvider;
 
@@ -24,7 +25,7 @@ public class LoginController implements IApiResponse {
 	
 	private final AuthenticationManager authenticationManager;
 	private final AccountRepository accountRepository;
-	JWTTokenProvider jwtTokenProvider;
+	private final JWTTokenProvider jwtTokenProvider;
 	private final PasswordEncoder passwordEncoder;
 
 
@@ -53,19 +54,5 @@ public class LoginController implements IApiResponse {
 		authenticatedAccount.setLastLogin(LocalDateTime.now());
 		accountRepository.save(authenticatedAccount);
 		return createResponse(200, "Authenticatie succesvol", jwtResponse);
-	}
-	
-	@PostMapping("/account/register")
-	public ApiResponse<String> register(@RequestBody Account account) {
-		
-		if (accountRepository.findAccountByUsername(account.getUsername()).isPresent()) {
-			// TODO create custom exception for this situation
-			return null;
-		}
-		account.setPassword(passwordEncoder.encode(account.getPassword()));
-		account.setCreatedOn(LocalDateTime.now());
-		account.setUpdatedOn(LocalDateTime.now());
-		accountRepository.save(account);
-		return createResponse(200, "Account succesvol geregistreerd", account.getUsername());
 	}
 }

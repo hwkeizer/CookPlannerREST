@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cookplanner.domain.Recipe;
-import cookplanner.exception.NoRecipesFoundException;
+import cookplanner.exception.RecipeListEmptyException;
 import cookplanner.repository.RecipeRepository;
 
 @RestController
@@ -22,13 +22,14 @@ public class RecipeController {
 		this.recipeRepository = recipeRepository;
 	}
 	
+	// TODO: Implement ApiResponse
 	@GetMapping("/list")
-	public List<Recipe> getRecipeList() throws NoRecipesFoundException {
+	public List<Recipe> getRecipeList() throws RecipeListEmptyException {
 		List<Recipe> recipes = recipeRepository.findAll();
 		if (!recipes.isEmpty()) {
 			return recipes;
 		}
-		throw new NoRecipesFoundException();
+		throw new RecipeListEmptyException();
 	}
 	
 }

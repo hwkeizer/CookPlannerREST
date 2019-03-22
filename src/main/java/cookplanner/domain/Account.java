@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
@@ -34,15 +35,21 @@ public class Account  implements UserDetails {
     @Column(unique = true, nullable = false, length = 30)
     private String username;
     
-    @Column(length = 100)
+    @Column(length = 60)
+    @EqualsAndHashCode.Exclude
     private String password;
     
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
     private AccountRole role = AccountRole.USER;
     
+    @EqualsAndHashCode.Exclude
     private LocalDateTime createdOn;
+    
+    @EqualsAndHashCode.Exclude
     private LocalDateTime updatedOn;
+    
+    @EqualsAndHashCode.Exclude
     private LocalDateTime lastLogin;
     
     @JsonIgnore
