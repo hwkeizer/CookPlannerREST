@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -117,14 +118,13 @@ class AccountControllerTest {
 		Account account = getTestAccount(1L, "username_1", "password");
 		
 		// Execute & verify
-		mockMvc.perform(post("/account/delete")
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(account)))
+		mockMvc.perform(delete("/account/delete/1")
+				.contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("Account succesvol verwijderd"))
-				.andExpect(jsonPath("$.result").value("username_1"));
-		verify(accountRepository, times(1)).delete(account);
-		verify(accountRepository, times(1)).findAccountByUsername(account.getUsername());		
+				.andExpect(jsonPath("$.result").value("1"));
+		verify(accountRepository, times(1)).deleteById(account.getId());
+		verify(accountRepository, times(1)).findById(account.getId());		
 	}
 	
 	@Test
@@ -132,18 +132,17 @@ class AccountControllerTest {
 	void testDeleteAccount_NotDeleted() throws Exception {
 		// Prepare
 		Account account = getTestAccount(1L, "username_1", "password");
-		when(accountRepository.findAccountByUsername(account.getUsername())).thenReturn(Optional.of(account));
+		when(accountRepository.findById(account.getId())).thenReturn(Optional.of(account));
 		
 		// Execute && verify
-		MvcResult result = mockMvc.perform(post("/account/delete")
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(account)))
+		MvcResult result = mockMvc.perform(delete("/account/delete/1")
+				.contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isMethodNotAllowed())
 				.andReturn();
 		
 		assertEquals(result.getResponse().getErrorMessage(), "Kon account niet verwijderen");
-		verify(accountRepository, times(1)).delete(account);
-		verify(accountRepository, times(1)).findAccountByUsername(account.getUsername());
+		verify(accountRepository, times(1)).deleteById(account.getId());
+		verify(accountRepository, times(1)).findById(account.getId());
 	}
 	
 	private Account getTestAccount(Long id, String username, String password) {

@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,16 +61,16 @@ public class AccountController implements IApiResponse {
 				"Account succesvol geregistreerd", 
 				accountRepository.save(account).getUsername());
 	}
-	
-	@PostMapping("/delete")
-	public ApiResponse<String> deleteAccount(@RequestBody Account account) throws AccountNotDeletedException {
-		accountRepository.delete(account);
-		if (accountRepository.findAccountByUsername(account.getUsername()).isPresent()) {
+
+	@DeleteMapping("/delete/{id}")
+	public ApiResponse<String> deleteAccount(@PathVariable String id) throws AccountNotDeletedException {
+		accountRepository.deleteById(Long.parseLong(id));
+		if (accountRepository.findById(Long.parseLong(id)).isPresent()) {
 			throw new AccountNotDeletedException();
 		}
 		return createResponse(
 				200, 
 				"Account succesvol verwijderd",
-				account.getUsername());
+				id);
 	}
 }
