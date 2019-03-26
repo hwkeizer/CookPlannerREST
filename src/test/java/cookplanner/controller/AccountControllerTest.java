@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -109,6 +110,41 @@ class AccountControllerTest {
 				.andExpect(status().isConflict())
 				.andReturn();
 		assertEquals(result.getResponse().getErrorMessage(), "Gebruikersnaam bestaat al");
+	}
+	
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	void testUpdateAccount_HappyPath() throws Exception {
+		// Prepare
+		Account account = getTestAccount(1L, "username_1", "password");
+		when(accountRepository.findById(account.getId())).thenReturn(Optional.of(account));
+		account.setUsername("username_2");
+		when(accountRepository.save(account)).thenReturn(account);
+		
+		mockMvc.perform(put("/account/update")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(account)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("Account succesvol gewijzigd"))
+				.andExpect(jsonPath("$.result.username").value("username_2"));		
+	}
+	
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	void testUpdateAccount_NotFound() throws Exception {
+		// Prepare
+		Account account = getTestAccount(1L, "username_1", "password");
+		when(accountRepository.findById(account.getId())).thenReturn(Optional.empty());
+		
+		MvcResult result = mockMvc.perform(put("/account/update")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(account)))
+				.andExpect(status().isNotFound())
+				.andReturn();
+		assertEquals(result.getResponse().getErrorMessage(), "Geen account gevonden");
+		verify(accountRepository, times(1)).findById(account.getId());
+		verify(accountRepository, times(0)).save(account);
+		
 	}
 	
 	@Test

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cookplanner.api.ApiResponse;
 import cookplanner.domain.Account;
+import cookplanner.exception.AccountDoesNotExistException;
 import cookplanner.exception.AccountListEmptyException;
 import cookplanner.exception.AccountNotDeletedException;
 import cookplanner.exception.UsernameAlreadyExistsException;
@@ -60,6 +61,18 @@ public class AccountController implements IApiResponse {
 				200, 
 				"Account succesvol geregistreerd", 
 				accountRepository.save(account).getUsername());
+	}
+	
+	@PutMapping("/update")
+	public ApiResponse<Account> updateAccount(@RequestBody Account account) throws AccountDoesNotExistException {
+		if (!accountRepository.findById(account.getId()).isPresent()) {
+			throw new AccountDoesNotExistException();
+		}
+		Account accountResult = accountRepository.save(account);
+		return createResponse(
+				200, 
+				"Account succesvol gewijzigd", 
+				accountResult);
 	}
 
 	@DeleteMapping("/delete/{id}")
