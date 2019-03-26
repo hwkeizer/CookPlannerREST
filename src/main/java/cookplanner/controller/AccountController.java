@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cookplanner.api.ApiResponse;
 import cookplanner.domain.Account;
 import cookplanner.exception.AccountListEmptyException;
+import cookplanner.exception.AccountNotDeletedException;
 import cookplanner.exception.UsernameAlreadyExistsException;
 import cookplanner.repository.AccountRepository;
 
@@ -43,9 +44,9 @@ public class AccountController implements IApiResponse {
 		throw new AccountListEmptyException();
 	}
 
-	// TODO: Would probably be better to respond with a 201 (created) but that requires different setup
+	// TODO: Would probably be better to respond with a 201 (created)? => but that requires different setup
 	@PostMapping("/register")
-	public ApiResponse<String> register(@RequestBody Account account) throws UsernameAlreadyExistsException {
+	public ApiResponse<String> registerAccount(@RequestBody Account account) throws UsernameAlreadyExistsException {
 		if (accountRepository.findAccountByUsername(account.getUsername()).isPresent()) {
 			throw new UsernameAlreadyExistsException();
 		}
@@ -56,5 +57,17 @@ public class AccountController implements IApiResponse {
 				200, 
 				"Account succesvol geregistreerd", 
 				accountRepository.save(account).getUsername());
+	}
+	
+	@PostMapping("/delete")
+	public ApiResponse<String> deleteAccount(@RequestBody Account account) throws AccountNotDeletedException {
+		accountRepository.delete(account);
+		if (accountRepository.findAccountByUsername(account.getUsername()).isPresent()) {
+			throw new AccountNotDeletedException();
+		}
+		return createResponse(
+				200, 
+				"Account succesvol verwijderd",
+				account.getUsername());
 	}
 }

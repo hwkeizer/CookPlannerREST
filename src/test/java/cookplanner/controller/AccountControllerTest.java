@@ -1,6 +1,8 @@
 package cookplanner.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,7 +80,7 @@ class AccountControllerTest {
 	}
 
 	@Test
-	void testRegister_HappyPath() throws Exception {
+	void testRegisterAccount_HappyPath() throws Exception {
 		// Prepare
 		Account account = getTestAccount(1L, "username_1", "password");
 		when(accountRepository.findAccountByUsername(account.getUsername())).thenReturn(Optional.empty());
@@ -94,7 +96,7 @@ class AccountControllerTest {
 	}
 	
 	@Test
-	void testRegister_UserAlreadyExists() throws Exception {
+	void testRegisterAccount_UserAlreadyExists() throws Exception {
 		// prepare
 		Account account = getTestAccount(1L, "username_1", "password");
 		when(accountRepository.findAccountByUsername(account.getUsername())).thenReturn(Optional.of(account));
@@ -106,6 +108,42 @@ class AccountControllerTest {
 				.andExpect(status().isConflict())
 				.andReturn();
 		assertEquals(result.getResponse().getErrorMessage(), "Gebruikersnaam bestaat al");
+	}
+	
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	void testDeleteAccount_HappyPath() throws Exception {
+		// Prepare
+		Account account = getTestAccount(1L, "username_1", "password");
+		
+		// Execute & verify
+		mockMvc.perform(post("/account/delete")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(account)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("Account succesvol verwijderd"))
+				.andExpect(jsonPath("$.result").value("username_1"));
+		verify(accountRepository, times(1)).delete(account);
+		verify(accountRepository, times(1)).findAccountByUsername(account.getUsername());		
+	}
+	
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	void testDeleteAccount_NotDeleted() throws Exception {
+		// Prepare
+		Account account = getTestAccount(1L, "username_1", "password");
+		when(accountRepository.findAccountByUsername(account.getUsername())).thenReturn(Optional.of(account));
+		
+		// Execute && verify
+		MvcResult result = mockMvc.perform(post("/account/delete")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(account)))
+				.andExpect(status().isMethodNotAllowed())
+				.andReturn();
+		
+		assertEquals(result.getResponse().getErrorMessage(), "Kon account niet verwijderen");
+		verify(accountRepository, times(1)).delete(account);
+		verify(accountRepository, times(1)).findAccountByUsername(account.getUsername());
 	}
 	
 	private Account getTestAccount(Long id, String username, String password) {
