@@ -21,7 +21,9 @@ import cookplanner.exception.AccountListEmptyException;
 import cookplanner.exception.AccountNotDeletedException;
 import cookplanner.exception.UsernameAlreadyExistsException;
 import cookplanner.repository.AccountRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
 @RequestMapping("/account")
@@ -68,6 +70,7 @@ public class AccountController implements IApiResponse {
 		if (!accountRepository.findById(account.getId()).isPresent()) {
 			throw new AccountDoesNotExistException();
 		}
+		account.setUpdatedOn(LocalDateTime.now());
 		Account accountResult = accountRepository.save(account);
 		return createResponse(
 				200, 
