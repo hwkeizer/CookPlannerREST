@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cookplanner.api.ApiResponse;
 import cookplanner.domain.Recipe;
 import cookplanner.exception.RecipeListEmptyException;
 import cookplanner.repository.RecipeRepository;
@@ -14,7 +15,7 @@ import cookplanner.repository.RecipeRepository;
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
 @RequestMapping("/recipe")
-public class RecipeController {
+public class RecipeController implements IApiResponse {
 
 	private final RecipeRepository recipeRepository;
 
@@ -22,12 +23,14 @@ public class RecipeController {
 		this.recipeRepository = recipeRepository;
 	}
 	
-	// TODO: Implement ApiResponse
 	@GetMapping("/list")
-	public List<Recipe> getRecipeList() throws RecipeListEmptyException {
-		List<Recipe> recipes = recipeRepository.findAll();
-		if (!recipes.isEmpty()) {
-			return recipes;
+	public ApiResponse<List<Recipe>> getRecipeList() throws RecipeListEmptyException {
+		List<Recipe> recipeList = recipeRepository.findAll();
+		if (!recipeList.isEmpty()) {
+			return createResponse(
+					200, 
+					"Receptenlijst succesvol opgehaald", 
+					recipeList);
 		}
 		throw new RecipeListEmptyException();
 	}

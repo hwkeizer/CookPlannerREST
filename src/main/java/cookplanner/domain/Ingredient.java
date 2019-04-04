@@ -17,13 +17,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Ingredient {
 
-	public Ingredient(IngredientName name, Float amount, boolean stock, MeasureUnit measureUnit) {
-		this.name = name;
-		this.amount = amount;
-		this.stock = stock;
-		this.measureUnit = measureUnit;
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -36,11 +29,11 @@ public class Ingredient {
 	
 	@OneToOne(fetch = FetchType.EAGER)
 	private MeasureUnit measureUnit;
-
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "receipe_id")
-//	@ToString.Exclude
-//	@EqualsAndHashCode.Exclude
-//	private Recipe recipe;
 	
+	public Ingredient(IngredientName name, Float amount, boolean stock, MeasureUnit measureUnit) {
+		this.name = name;
+		this.amount = amount;
+		this.stock = stock;
+		this.measureUnit = measureUnit;
+	}
 }

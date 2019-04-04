@@ -50,7 +50,6 @@ public class AccountController implements IApiResponse {
 		throw new AccountListEmptyException();
 	}
 
-	// TODO: Would probably be better to respond with a 201 (created)? => but that requires different setup
 	@PostMapping("/register")
 	public ApiResponse<String> registerAccount(@RequestBody Account account) throws UsernameAlreadyExistsException {
 		if (accountRepository.findAccountByUsername(account.getUsername()).isPresent()) {

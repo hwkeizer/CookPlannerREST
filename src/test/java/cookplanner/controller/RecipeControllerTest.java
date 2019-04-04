@@ -56,8 +56,9 @@ class RecipeControllerTest {
 				.accept(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(jsonPath("$[0].name").value("recipe 1"))
-				.andExpect(jsonPath("$[1].name").value("recipe 2"));		
+				.andExpect(jsonPath("$.message").value("Receptenlijst succesvol opgehaald"))
+				.andExpect(jsonPath("$.result.[0].name").value("recipe 1"))
+				.andExpect(jsonPath("$.result.[1].name").value("recipe 2"));		
 	}
 	
 	@Test
