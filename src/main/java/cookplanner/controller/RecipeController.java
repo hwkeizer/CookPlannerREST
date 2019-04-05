@@ -50,7 +50,6 @@ public class RecipeController implements IApiResponse {
 	
 	@GetMapping(value = "/get-image", produces = MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] getImage(@RequestParam String name) throws IOException {
-		log.debug("IN GET IMAGE: {}", name);
 		Path imagePath = FileSystems.getDefault().getPath(imageLocation, name);
 		return Files.readAllBytes(imagePath);
 	}
