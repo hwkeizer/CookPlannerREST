@@ -15,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import lombok.Data;
@@ -70,12 +69,10 @@ public class Recipe {
 	}
 	
 	public void addIngredient(Ingredient ingredient) {
-//		ingredient.setRecipe(this); // Set both sides of the relation
 		ingredients.add(ingredient);
 	}
 	
 	public void removeIngredient(Ingredient ingredient) {
-//		ingredient.setRecipe(null);
 		ingredients.remove(ingredient);
 		
 	}
