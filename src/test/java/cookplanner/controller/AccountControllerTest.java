@@ -117,13 +117,14 @@ class AccountControllerTest {
 	void testUpdateAccount_HappyPath() throws Exception {
 		// Prepare
 		Account account = getTestAccount(1L, "username_1", "password");
-		when(accountRepository.findById(account.getId())).thenReturn(Optional.of(account));
-		account.setUsername("username_2");
-		when(accountRepository.save(account)).thenReturn(account);
+		Account accountResult = getTestAccount(1L, "username_2", "password");
+		when(accountRepository.findById(accountResult.getId())).thenReturn(Optional.of(account));		
+		when(accountRepository.save(accountResult)).thenReturn(accountResult);
 		
+		// Execute & verify
 		mockMvc.perform(put("/account/update")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(account)))
+				.content(objectMapper.writeValueAsString(accountResult)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("Account succesvol gewijzigd"))
 				.andExpect(jsonPath("$.result.username").value("username_2"));		
@@ -141,7 +142,7 @@ class AccountControllerTest {
 				.content(objectMapper.writeValueAsString(account)))
 				.andExpect(status().isNotFound())
 				.andReturn();
-		assertEquals(result.getResponse().getErrorMessage(), "Geen account gevonden");
+		assertEquals(result.getResponse().getErrorMessage(), "Account niet gevonden");
 		verify(accountRepository, times(1)).findById(account.getId());
 		verify(accountRepository, times(0)).save(account);
 		

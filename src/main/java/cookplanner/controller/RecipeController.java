@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cookplanner.api.ApiResponse;
 import cookplanner.domain.Recipe;
 import cookplanner.domain.RecipeType;
+import cookplanner.exception.RecipeDoesNotExistException;
 import cookplanner.exception.RecipeListEmptyException;
 import cookplanner.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +63,7 @@ public class RecipeController implements IApiResponse {
 	@GetMapping("/types")
 	public ApiResponse<List<String>> getRecipeTypes() {
 		List<String> types = Stream.of(RecipeType.values())
-				.map(RecipeType::name)
+				.map(RecipeType::toString)
 				.collect(Collectors.toList());
 		return createResponse(
 				200,
@@ -72,12 +73,15 @@ public class RecipeController implements IApiResponse {
 	}
 	
 	@PutMapping("/update")
-	public ApiResponse<Recipe> updateRecipe(@RequestBody Recipe recipe) {
-		recipeRepository.save(recipe);
+	public ApiResponse<Recipe> updateRecipe(@RequestBody Recipe recipe) throws RecipeDoesNotExistException {
+		if (!recipeRepository.findById(recipe.getId()).isPresent()) {
+			throw new RecipeDoesNotExistException();
+		}
+		Recipe recipeResult = recipeRepository.save(recipe);
 		return createResponse(
 				200,
 				"Recept succesvol gewijzigd",
-				recipe);
+				recipeResult);
 	}
 	
 }
