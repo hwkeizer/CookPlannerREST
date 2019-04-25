@@ -1,17 +1,9 @@
 package cookplanner.controller;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.naming.SizeLimitExceededException;
-
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 import cookplanner.api.ApiResponse;
 import cookplanner.domain.Recipe;
 import cookplanner.domain.RecipeType;
+import cookplanner.domain.Tag;
 import cookplanner.exception.ImageFolderExceedsThreshold;
 import cookplanner.exception.ImageUploadFailedException;
 import cookplanner.exception.RecipeDoesNotExistException;
 import cookplanner.exception.RecipeListEmptyException;
+import cookplanner.exception.TagListEmptyException;
 import cookplanner.repository.RecipeRepository;
+import cookplanner.repository.TagRepository;
 import cookplanner.service.FileSystemService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,10 +38,13 @@ public class RecipeController implements IApiResponse {
 
 	private final RecipeRepository recipeRepository;
 	private final FileSystemService fileSystemService;
+	private final TagRepository tagRepository;
 	
-	public RecipeController(RecipeRepository recipeRepository, FileSystemService fileSystemService) {
+	public RecipeController(RecipeRepository recipeRepository, FileSystemService fileSystemService,
+			TagRepository tagRepository) {
 		this.recipeRepository = recipeRepository;
 		this.fileSystemService = fileSystemService;
+		this.tagRepository = tagRepository;
 	}
 
 	@GetMapping("/list")
@@ -84,8 +82,19 @@ public class RecipeController implements IApiResponse {
 		return createResponse(
 				200,
 				"Recept types succesvol opgehaald",
-				types);
-				
+				types);				
+	}
+	
+	@GetMapping("/all-tags")
+	public ApiResponse<List<Tag>> getAllTags() throws TagListEmptyException {
+		List<Tag> tagList = tagRepository.findAll();
+		if (!tagList.isEmpty()) {
+			return createResponse(
+					200, 
+					"Lijst met alle categorieën succesvol opgehaald",
+					tagList);
+		}
+		throw new TagListEmptyException();
 	}
 	
 	@PutMapping("/update")

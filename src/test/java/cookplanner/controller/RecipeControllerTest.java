@@ -30,9 +30,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cookplanner.domain.Recipe;
 import cookplanner.domain.RecipeType;
 import cookplanner.repository.RecipeRepository;
+import cookplanner.repository.TagRepository;
 import cookplanner.security.CustomUserDetailsService;
 import cookplanner.security.JWTAuthenticationEntryPoint;
 import cookplanner.security.JWTTokenProvider;
+import cookplanner.service.FileSystemService;
+import cookplanner.service.FileSystemServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(value = RecipeController.class)
@@ -43,8 +46,9 @@ class RecipeControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	
-	@MockBean
-	RecipeRepository recipeRepository;
+	@MockBean RecipeRepository recipeRepository;
+	@MockBean FileSystemService fileSystemService;
+	@MockBean TagRepository tagRepository;	
 	
 	// MockBeans required for securityContext
 	@MockBean CustomUserDetailsService cudService;

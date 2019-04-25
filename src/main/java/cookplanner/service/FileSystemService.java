@@ -1,6 +1,5 @@
 package cookplanner.service;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
 import cookplanner.exception.ImageFolderExceedsThreshold;
