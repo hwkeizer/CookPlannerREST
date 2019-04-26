@@ -22,6 +22,9 @@ public class IngredientName {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(unique=true, length = 30)
+	@Column(unique=true, length = 50)
 	private String name;
+	
+	@Column(length = 50)
+	private String pluralName;
 }
