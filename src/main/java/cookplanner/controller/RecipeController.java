@@ -102,6 +102,7 @@ public class RecipeController implements IApiResponse {
 		if (!recipeRepository.findById(recipe.getId()).isPresent()) {
 			throw new RecipeDoesNotExistException();
 		}
+		log.debug("RECIPE UPDATE: {}", recipe);
 		Recipe recipeResult = recipeRepository.save(recipe);
 		return createResponse(
 				200,

@@ -1,5 +1,7 @@
 package cookplanner.security;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,11 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
-		// TODO: adjust for Optional
-		Account account = accountRepository.findAccountByUsername(username).get();
-		if (account == null) {
+		Optional<Account> optionalAccount = accountRepository.findAccountByUsername(username);
+		if (!optionalAccount.isPresent()) {
 			throw new UsernameNotFoundException(username);
 		}
-		return account;
+		return optionalAccount.get();
 	}
 }
