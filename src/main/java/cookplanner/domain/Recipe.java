@@ -38,8 +38,7 @@ public class Recipe {
 	@Lob
 	private String notes;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "recipe_id")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
 	private Set<Ingredient> ingredients = new HashSet<>();
 
 	private String image;
@@ -68,7 +67,15 @@ public class Recipe {
 		this.name = name;
 	}
 	
+	public void setIngredients(Set<Ingredient> ingredients) {
+		this.ingredients.clear();
+		for (Ingredient ingredient : ingredients) {
+			addIngredient(ingredient);
+		}
+	}
+	
 	public void addIngredient(Ingredient ingredient) {
+		ingredient.setRecipe(this);
 		ingredients.add(ingredient);
 	}
 	
