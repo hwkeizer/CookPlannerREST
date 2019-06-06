@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -137,6 +138,41 @@ class RecipeControllerTest {
 				.andExpect(jsonPath("$.message").value("Recept types succesvol opgehaald"))
 				.andExpect(jsonPath("$.result").value(recipeTypes));			
 	}
+	
+	@Test
+	@WithMockUser
+	void testDeleteRecipe_HappyPath() throws Exception {
+		// Prepare
+		Recipe recipe = getTestRecipe(1L, "testRecipe1");
+		
+		// Execute & verify
+		mockMvc.perform(delete("/recipe/delete/1")
+				.contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("Recept succesvol verwijderd"))
+				.andExpect(jsonPath("$.result").value("1"));
+		verify(recipeRepository, times(1)).deleteById(recipe.getId());
+		verify(recipeRepository, times(1)).findById(recipe.getId());
+	}
+	
+	@Test
+	@WithMockUser
+	void testDeleteRecipe_NotDeleted() throws Exception {
+		// Prepare
+		Recipe recipe = getTestRecipe(1L, "testRecipe1");
+		when(recipeRepository.findById(recipe.getId())).thenReturn(Optional.of(recipe));
+		
+		// Execute & verify
+		MvcResult result = mockMvc.perform(delete("/recipe/delete/1")
+				.contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isMethodNotAllowed())
+				.andReturn();
+		
+		assertEquals(result.getResponse().getErrorMessage(), "Kon recept niet verwijderen");
+		verify(recipeRepository, times(1)).deleteById(recipe.getId());
+		verify(recipeRepository, times(1)).findById(recipe.getId());
+	}
+	
 	
 	private Recipe getTestRecipe(Long id, String name) {
 		Recipe recipe = new Recipe();

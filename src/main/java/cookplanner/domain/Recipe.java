@@ -38,7 +38,7 @@ public class Recipe {
 	@Lob
 	private String notes;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", orphanRemoval = true)
 	private Set<Ingredient> ingredients = new HashSet<>();
 
 	private String image;

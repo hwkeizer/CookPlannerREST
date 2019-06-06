@@ -6,7 +6,9 @@ import java.util.stream.Stream;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cookplanner.api.ApiResponse;
 import cookplanner.domain.Recipe;
 import cookplanner.domain.RecipeType;
@@ -24,6 +29,7 @@ import cookplanner.exception.ImageFolderExceedsThreshold;
 import cookplanner.exception.ImageUploadFailedException;
 import cookplanner.exception.RecipeDoesNotExistException;
 import cookplanner.exception.RecipeListEmptyException;
+import cookplanner.exception.RecipeNotDeletedException;
 import cookplanner.exception.TagListEmptyException;
 import cookplanner.repository.RecipeRepository;
 import cookplanner.repository.TagRepository;
@@ -102,12 +108,52 @@ public class RecipeController implements IApiResponse {
 		if (!recipeRepository.findById(recipe.getId()).isPresent()) {
 			throw new RecipeDoesNotExistException();
 		}
-		log.debug("RECIPE UPDATE: {}", recipe);
+		
+		// Log output in pretty json		
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			log.debug("RECIPE UPDATE: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		Recipe recipeResult = recipeRepository.save(recipe);
 		return createResponse(
 				200,
 				"Recept succesvol gewijzigd",
 				recipeResult);
+	}
+	
+	@PostMapping("/create")
+	public ApiResponse<Recipe> createRecipe(@RequestBody Recipe recipe) {
+		log.debug("IN POST UPDATE");
+		// Log output in pretty json		
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			log.debug("RECIPE UPDATE: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Recipe recipeResult = recipeRepository.save(recipe);
+		return createResponse(
+				200,
+				"Recept succesvol aangemaakt",
+				recipeResult);
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	public ApiResponse<String> deleteRecipe(@PathVariable String id) throws RecipeNotDeletedException {
+		log.debug("TO BE DELETED RECIPE ID: {}", id);
+		recipeRepository.deleteById(Long.parseLong(id));
+		if (recipeRepository.findById(Long.parseLong(id)).isPresent()) {
+			throw new RecipeNotDeletedException();
+		}
+		return createResponse(
+				200,
+				"Recept succesvol verwijderd",
+				id);
 	}
 	
 }
