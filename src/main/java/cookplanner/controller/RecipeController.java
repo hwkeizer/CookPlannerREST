@@ -1,10 +1,10 @@
 package cookplanner.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +22,6 @@ import cookplanner.api.ApiResponse;
 import cookplanner.domain.Recipe;
 import cookplanner.domain.RecipeType;
 import cookplanner.domain.Tag;
-import cookplanner.exception.ImageFolderExceedsThreshold;
-import cookplanner.exception.ImageUploadFailedException;
 import cookplanner.exception.RecipeDoesNotExistException;
 import cookplanner.exception.RecipeListEmptyException;
 import cookplanner.exception.RecipeNotDeletedException;
@@ -42,15 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/recipe")
 public class RecipeController implements IApiResponse {
 
-	private final RecipeRepository recipeRepository;
-	private final FileSystemService fileSystemService;
+	private final RecipeRepository recipeRepository;	
 	private final TagRepository tagRepository;
+	private final FileSystemService fileSystemService;
 	
-	public RecipeController(RecipeRepository recipeRepository, FileSystemService fileSystemService,
-			TagRepository tagRepository) {
+	public RecipeController(RecipeRepository recipeRepository, TagRepository tagRepository,
+			FileSystemService fileSystemService) {
 		this.recipeRepository = recipeRepository;
-		this.fileSystemService = fileSystemService;
 		this.tagRepository = tagRepository;
+		this.fileSystemService = fileSystemService;
 	}
 
 	@GetMapping("/list")
@@ -63,21 +58,6 @@ public class RecipeController implements IApiResponse {
 					recipeList);
 		}
 		throw new RecipeListEmptyException();
-	}
-	
-	@GetMapping(value = "/get-image", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
-	public @ResponseBody byte[] getImage(@RequestParam String name) {
-		return fileSystemService.getImageFile(name);
-	}
-	
-	@PostMapping(value = "/upload-image")
-	public ApiResponse<String> uploadImage(@RequestParam("file") MultipartFile file) 
-			throws ImageUploadFailedException, ImageFolderExceedsThreshold {
-		String filePath = fileSystemService.saveImageFile(file);
-		return createResponse(
-				200, 
-				"Afbeelding succesvol opgeslagen", 
-				filePath);
 	}
 	
 	@GetMapping("/types")
@@ -112,7 +92,7 @@ public class RecipeController implements IApiResponse {
 		// Log output in pretty json		
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			log.debug("RECIPE UPDATE: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
+			log.debug("Recipe updated: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,13 +105,36 @@ public class RecipeController implements IApiResponse {
 				recipeResult);
 	}
 	
+	/**
+	 * Method to update the recipe image. This method will move the current image (if it exists) back to
+	 * the upload folder and will move the new image to the image folder
+	 * @param recipeId path variable that holds the recipe id
+	 * @param imageName RequestBody with the name of the image
+	 * @return api response
+	 * @throws RecipeDoesNotExistException
+	 */
+	@PutMapping("{recipeId}/update-image")
+	public ApiResponse<String> updateImage(@PathVariable String recipeId, @RequestBody String imageName) 
+			throws RecipeDoesNotExistException {
+		if (!recipeRepository.findById(Long.parseLong(recipeId)).isPresent()) {
+			throw new RecipeDoesNotExistException();
+		}
+		Recipe recipe = recipeRepository.findById(Long.parseLong(recipeId)).get();
+		String newName = fileSystemService.replaceImage(recipe.getImage(), imageName);
+		recipe.setImage(newName);
+		recipeRepository.save(recipe);
+		return createResponse(
+				200, 
+				"Afbeelding succesvol gewijzigd", 
+				newName);
+	}
+	
 	@PostMapping("/create")
-	public ApiResponse<Recipe> createRecipe(@RequestBody Recipe recipe) {
-		log.debug("IN POST UPDATE");
+	public ApiResponse<Recipe> createRecipe(@RequestBody Recipe recipe) {		
 		// Log output in pretty json		
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			log.debug("RECIPE UPDATE: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
+			log.debug("Recipe created: {}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(recipe.getIngredients()));
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -145,8 +148,11 @@ public class RecipeController implements IApiResponse {
 	
 	@DeleteMapping("/delete/{id}")
 	public ApiResponse<String> deleteRecipe(@PathVariable String id) throws RecipeNotDeletedException {
-		log.debug("TO BE DELETED RECIPE ID: {}", id);
-		recipeRepository.deleteById(Long.parseLong(id));
+		Optional<Recipe> optionalRecipe = recipeRepository.findById(Long.parseLong(id));
+		if (optionalRecipe.isPresent()) {
+			fileSystemService.removeImage(optionalRecipe.get().getImage());
+			recipeRepository.delete(optionalRecipe.get());
+		}		
 		if (recipeRepository.findById(Long.parseLong(id)).isPresent()) {
 			throw new RecipeNotDeletedException();
 		}

@@ -58,7 +58,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(forgotPasswordUrl).permitAll()
                 .antMatchers(resetPasswordUrl).permitAll()
                 
+                // TODO: fine-tune the authorizations, for now permitAll is ok
                 .antMatchers("/recipe/**").permitAll()
+                .antMatchers("/image/**").permitAll()
                 
                 .antMatchers("/account/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

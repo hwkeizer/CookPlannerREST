@@ -29,7 +29,7 @@ public class Recipe {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(length = 60)
+	@Column(unique=true, length = 60)
 	private String name;
 	
 	@Column(length = 120)
