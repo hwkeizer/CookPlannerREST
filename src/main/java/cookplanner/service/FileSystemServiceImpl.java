@@ -98,8 +98,8 @@ public class FileSystemServiceImpl implements FileSystemService {
 	}
 	
 	/**
-	 * Method to move a file from one location to another. A check is done to ensure the new filename
-	 * is unique and will not overwrite any other file.
+	 * Method to move a file from one location to another. The file name might be changed to 
+	 * ensure the new filename is unique and will not overwrite any other file.
 	 * 
 	 * @param fileName filename
 	 * @param oldLocation source folder
