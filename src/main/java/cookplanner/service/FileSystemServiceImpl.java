@@ -75,6 +75,9 @@ public class FileSystemServiceImpl implements FileSystemService {
 	 * @return name of the file in the uploadLocation
 	 */
 	public String removeImage(String oldImage) {
+		if (oldImage == null) {
+			return null;
+		}
 		return moveFile(oldImage, imageLocation, uploadLocation).getName();
 	}
 	
@@ -91,6 +94,7 @@ public class FileSystemServiceImpl implements FileSystemService {
 	 */
 	@Override
 	public String replaceImage(String oldImage, String newImage) {
+		log.debug("OldImage: {}", oldImage);
 		if (oldImage != null) {
 			moveFile(oldImage, imageLocation, uploadLocation);
 		}

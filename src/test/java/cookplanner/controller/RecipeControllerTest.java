@@ -151,8 +151,7 @@ class RecipeControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("Recept succesvol verwijderd"))
 				.andExpect(jsonPath("$.result").value("1"));
-		verify(recipeRepository, times(1)).deleteById(recipe.getId());
-		verify(recipeRepository, times(1)).findById(recipe.getId());
+		verify(recipeRepository, times(2)).findById(recipe.getId());
 	}
 	
 	@Test
@@ -169,8 +168,7 @@ class RecipeControllerTest {
 				.andReturn();
 		
 		assertEquals(result.getResponse().getErrorMessage(), "Kon recept niet verwijderen");
-		verify(recipeRepository, times(1)).deleteById(recipe.getId());
-		verify(recipeRepository, times(1)).findById(recipe.getId());
+		verify(recipeRepository, times(2)).findById(recipe.getId());
 	}
 	
 	

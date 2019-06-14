@@ -18,7 +18,7 @@ import cookplanner.api.ApiResponse;
 import cookplanner.domain.MeasureUnit;
 import cookplanner.exception.MeasureUnitAlreadyExistsException;
 import cookplanner.exception.MeasureUnitDoesNotExistException;
-import cookplanner.exception.MeasureUnitInUseCannotBeDeleted;
+import cookplanner.exception.MeasureUnitInUseCannotBeDeletedException;
 import cookplanner.exception.MeasureUnitListEmptyException;
 import cookplanner.exception.MeasureUnitNotDeletedException;
 import cookplanner.repository.MeasureUnitRepository;
@@ -77,11 +77,11 @@ public class MeasureUnitController implements IApiResponse {
 	
 	@DeleteMapping("/delete/{id}")
 	public ApiResponse<String> deleteMeasureUnit(@PathVariable String id) 
-			throws MeasureUnitNotDeletedException, MeasureUnitInUseCannotBeDeleted {
+			throws MeasureUnitNotDeletedException, MeasureUnitInUseCannotBeDeletedException {
 		try {
 			measureUnitRepository.deleteById(Long.parseLong(id));
 		} catch (DataIntegrityViolationException e) {
-			throw new MeasureUnitInUseCannotBeDeleted();
+			throw new MeasureUnitInUseCannotBeDeletedException();
 		}
 		if (measureUnitRepository.existsById(Long.parseLong(id))) {
 			throw new MeasureUnitNotDeletedException();
