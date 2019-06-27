@@ -38,7 +38,7 @@ import cookplanner.security.JWTTokenProvider;
 import cookplanner.service.FileSystemService;
 import cookplanner.service.FileSystemServiceImpl;
 
-@ExtendWith(SpringExtension.class)
+//@ExtendWith(SpringExtension.class)
 @WebMvcTest(value = RecipeController.class)
 class RecipeControllerTest {
 

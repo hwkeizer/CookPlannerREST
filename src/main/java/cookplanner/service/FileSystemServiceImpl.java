@@ -95,7 +95,8 @@ public class FileSystemServiceImpl implements FileSystemService {
 	@Override
 	public String replaceImage(String oldImage, String newImage) {
 		log.debug("OldImage: {}", oldImage);
-		if (oldImage != null) {
+//		 Make a valid check on existence of file
+		if (oldImage != null && oldImage != "") {
 			moveFile(oldImage, imageLocation, uploadLocation);
 		}
 		return moveFile(newImage, uploadLocation, imageLocation).getName();
@@ -111,10 +112,16 @@ public class FileSystemServiceImpl implements FileSystemService {
 	 * @return The new File object (name can be changed)
 	 */
 	private File moveFile(String fileName, String oldLocation, String newLocation ) {
-		File oldFile = FileSystems.getDefault().getPath(oldLocation, fileName).toFile();
-		File newFile = getUniqueFile(newLocation, fileName);
-		oldFile.renameTo(newFile);
-		return newFile;
+		Path oldFile = FileSystems.getDefault().getPath(oldLocation, fileName);
+		Path newFile = getUniqueFile(newLocation, fileName);
+		try {
+			newFile =  Files.move(oldFile, newFile);
+			log.debug("New file location: {}", newFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return newFile.toFile();
 	}
 	
 	/**
@@ -126,13 +133,13 @@ public class FileSystemServiceImpl implements FileSystemService {
 	 * @param fileName to check
 	 * @return Unique File object
 	 */
-	private File getUniqueFile(String location, String fileName) {
+	private Path getUniqueFile(String location, String fileName) {
 		while (FileSystems.getDefault().getPath(location,  fileName).toFile().exists()) {
 			String extension = fileName.substring(fileName.indexOf("."));
 			fileName = fileName.substring(0, fileName.indexOf("."));
 			fileName = fileName.concat(""+((int)(Math.random()*10)) + extension);
 		}
-		return FileSystems.getDefault().getPath(location, fileName).toFile();
+		return FileSystems.getDefault().getPath(location, fileName);
 	}
 	
 	private List<String> getFolderList(Path folder) throws IOException {
