@@ -32,8 +32,8 @@ public class Recipe {
 	@Column(unique=true, length = 60)
 	private String name;
 	
-	@Column(length = 120)
-	private String description;
+	@Lob
+	private String servingTips;
 
 	@Lob
 	private String notes;
