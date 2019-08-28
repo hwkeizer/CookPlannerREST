@@ -36,23 +36,23 @@ public class Ingredient {
 	private IngredientName name;
 	
 	private Float amount;
-	private boolean stock;
+//	private boolean stock;
 	
 	@OneToOne(fetch = FetchType.EAGER)
 	private MeasureUnit measureUnit;
 	
-	public Ingredient(IngredientName name, Float amount, boolean stock, MeasureUnit measureUnit) {
+	public Ingredient(IngredientName name, Float amount, MeasureUnit measureUnit) {
 		this.name = name;
 		this.amount = amount;
-		this.stock = stock;
+//		this.stock = stock;
 		this.measureUnit = measureUnit;
 	}	
 	
-	public Ingredient(Recipe recipe, IngredientName name, Float amount, boolean stock, MeasureUnit measureUnit) {
+	public Ingredient(Recipe recipe, IngredientName name, Float amount, MeasureUnit measureUnit) {
 		this.recipe = recipe;
 		this.name = name;
 		this.amount = amount;
-		this.stock = stock;
+//		this.stock = stock;
 		this.measureUnit = measureUnit;
 	}	
 }

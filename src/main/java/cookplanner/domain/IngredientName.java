@@ -27,4 +27,5 @@ public class IngredientName {
 	
 	@Column(length = 50)
 	private String pluralName;
+	private boolean stock;
 }
