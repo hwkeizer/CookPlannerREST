@@ -141,6 +141,8 @@
 //		planning.setId(id);
 //		return planning;
 //	}
+//
+// Insert method to test updatePlanning
 //	
 //	private Planning getTestPlanning(Long id, Recipe recipe) {
 //		Planning planning = new Planning();

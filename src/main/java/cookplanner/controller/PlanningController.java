@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,6 +65,15 @@ public class PlanningController implements IApiResponse {
 				200,
 				"Planning succesvol verwijderd",
 				planBoard);
+	}
+	
+	@PutMapping("/update") 
+	public ApiResponse<List<Planning>> updatePlanning(@RequestBody List<Planning> planning) {
+		List<Planning> updatedPlanning = planBoardService.updatePlanning(planning);
+		return createResponse(
+				200, 
+				"Planning succesvol aangepast", 
+				updatedPlanning);
 	}
 	
 }

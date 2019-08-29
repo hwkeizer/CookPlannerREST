@@ -68,6 +68,14 @@ public class PlanBoardServiceImpl implements PlanBoardService {
 		return planBoard;
 	}
 	
+	/**
+	 * Update a list of plannings
+	 */
+	@Override
+	public List<Planning> updatePlanning(List<Planning> planningList) {		
+		return planningRepository.saveAll(planningList);		
+	}
+	
 	private LocalDate getFirstAvailableDate(List<Planning> planBoard) {
 		LocalDate localDate = LocalDate.now();
 		if (planBoard.isEmpty()) return localDate;

@@ -14,4 +14,6 @@ public interface PlanBoardService {
 	public List<Planning> addPlanning(Recipe recipe);
 	
 	public List<Planning> removePlanning(Long planningId);
+	
+	public List<Planning> updatePlanning(List<Planning> planningList);
 }
